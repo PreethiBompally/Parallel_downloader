@@ -40,3 +40,21 @@ Parallel Downloader is a Rust-based command-line tool aimed at creating a highly
         - webpki_roots: This crate provides trusted root certificates required by rustls for TLS handshake. (To be implemented along with TLS integration.)
 
         - Standard Library (std): Rust’s standard library is used for foundational functionalities like networking (std::net), file handling (std::fs), multithreading (std::thread), and input/output operations (std::io).
+
+
+### Current State:
+ 
+    - DNS resolution and TCP connection functionalities are implemented.
+    - Command-line interface and basic single-threaded download support are available.
+    - TLS integration and file merging are still under development.
+ 
+### Future Plans:
+ 
+    - v2: Introduce secure data transmission using rustls and extend the downloader for single-threaded downloads over secure connections.
+    - v3: Enable multi-threaded downloads and file merging to significantly improve download speed and efficiency.
+    - final: Implement comprehensive testing, fuzzing, and publish the crate on crates.io.
+ 
+## Usage Instructions
+    To compile and run the project:
+    - cargo build
+    - cargo run -- --url "https://example.com/file.zip" --output "output_file.zip" --num-connections 1
