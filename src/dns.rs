@@ -1,10 +1,12 @@
-use std::net::ToSocketAddrs;
+use std::net::{IpAddr, ToSocketAddrs};
+use crate::error::DownloaderError;
 
-pub fn get_request_ip(host_name: &str) -> Result<String, std::io::Error> {
-    let socket_addr = (host_name, 80).to_socket_addrs()?;
-    let ip = socket_addr
-        .filter(|addr| addr.is_ipv4())
+pub fn get_request_ip(hostname: &str) -> Result<IpAddr, DownloaderError> {
+    let socket_addr = format!("{}:443", hostname)
+        .to_socket_addrs()
+        .map_err(|e| DownloaderError::DnsError(e.to_string()))?
         .next()
-        .ok_or_else(|| std::io::Error::new(std::io::ErrorKind::NotFound, "No IPv4 address found"))?;
-    Ok(ip.ip().to_string())
+        .ok_or_else(|| DownloaderError::DnsError("No IP address found".into()))?;
+    
+    Ok(socket_addr.ip())
 }
