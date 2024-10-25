@@ -9,6 +9,7 @@ Parallel Downloader is a Rust-based command-line tool aimed at creating a highly
 - DNS resolution for translating domain names into IP addresses.
 - TCP connection establishment to initiate downloads.
 - TLS connection integration.
+- Single threaded download of file.
 - Outcome: A basic version that can initiate a single-threaded download using command-line inputs.
 
 

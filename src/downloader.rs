@@ -32,8 +32,8 @@ impl DownloadManager {
                 .map_err(|e| DownloaderError::FileError(format!("Error writing to file: {}", e)))?;
             downloaded_size += bytes_read as u64;
     
-            let progress = (downloaded_size as f64 / self.total_size as f64) * 100.0;
-            println!("Downloaded: {:.2}%", progress);
+            // let progress = (downloaded_size as f64 / self.total_size as f64) * 100.0;
+            // println!("Downloaded: {:.2}%", progress);
         }
     
         // if downloaded_size != self.total_size {
