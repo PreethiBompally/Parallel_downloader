@@ -1,6 +1,7 @@
 use parallel_downloader::{DownloadConfig, DownloadManager, DownloaderError,dns, connection, http};
 use url::Url;
 use std::io::{self, Write};
+use std::path::Path;
 
 fn main() -> Result<(), DownloaderError> {
     println!("\n=== Parallel File Downloader ===\n");
@@ -22,7 +23,7 @@ fn main() -> Result<(), DownloaderError> {
                 }
             }
             "2" => {
-                println!("\nGoodbye!");
+                println!("\nThank You!");
                 break;
             }
             _ => println!("\nInvalid choice. Please try again."),
@@ -54,20 +55,25 @@ fn handle_download() -> Result<(), DownloaderError> {
         return Err(DownloaderError::UserInputError("Number of connections must be between 1 and 32".into()));
     }
 
-    // Get output filename
+    // Determine the default filename from the URL path
     let default_filename = url.path_segments()
         .and_then(|segments| segments.last())
-        .unwrap_or("downloaded_file")
-        .to_string();
-    
+        .and_then(|last_segment| Some(last_segment.to_string()))
+        .unwrap_or("downloaded_file".to_string());
+
     print!("Enter output filename (default: {}): ", default_filename);
     io::stdout().flush().unwrap();
     let mut filename_input = String::new();
     io::stdin().read_line(&mut filename_input)?;
     let output_filename = if filename_input.trim().is_empty() {
-        default_filename
+        default_filename.clone()
     } else {
-        filename_input.trim().to_string()
+        let input_trimmed = filename_input.trim();
+        if Path::new(input_trimmed).extension().is_none() {
+            format!("{}.{}", input_trimmed, Path::new(&default_filename).extension().unwrap_or_default().to_str().unwrap_or("dat"))
+        } else {
+            input_trimmed.to_string()
+        }
     };
 
     println!("\nInitializing download...");
@@ -84,10 +90,10 @@ fn handle_download() -> Result<(), DownloaderError> {
 
     println!("Resolving hostname...");
     let ip = dns::get_request_ip(hostname)?;
-    
+
     println!("Establishing connection...");
     let mut stream = connection::establish_tls_connection(hostname, ip)?;
-    
+
     println!("Checking file details...");
     let (supports_range, total_size) = http::send_head_request(&mut stream, hostname, path)?;
 
@@ -103,7 +109,7 @@ fn handle_download() -> Result<(), DownloaderError> {
     println!("Starting download...");
 
     let manager = DownloadManager::new(config, total_size);
-    manager.download(&mut stream)?;
+    manager.download()?;
 
     println!("\nDownload completed successfully!");
     println!("File saved as: {}\n", output_filename);
