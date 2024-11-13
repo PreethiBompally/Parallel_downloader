@@ -1,29 +1,28 @@
-# Parallel_downloader
+# Parallel Downloader
 
-Parallel Downloader is a Rust-based command-line tool aimed at creating a highly efficient download manager. The project utilizes parallel TCP connections to split files into parts, download them concurrently, and merge them efficiently. Our objective is to leverage Rust's concurrency and memory safety to achieve enhanced speed and reliability in file downloads.
+Parallel Downloader is a Rust-based command-line tool aimed at creating a highly efficient download manager. The project utilizes parallel TCP connections to split files into parts, download them concurrently, and merge them efficiently. Our objective is to leverage Rust's concurrency and memory safety to achieve enhanced speed and reliability in file downloads. It supports .jpg, .png, .gif files.
 
-## Phase 2:
+## Phase 3:
 
 ### Current Features:
-- Simple command-line interface for users to specify download parameters.
-- DNS resolution for translating domain names into IP addresses.
-- TCP connection establishment to initiate downloads.
-- TLS connection integration.
-- Single threaded download of file.
-- Outcome: A basic version that can initiate a single-threaded download using command-line inputs.
-
-
-- Multi-threaded download and file merging are still under development.
+- Simple command-line interface for user input on download parameters.
+- DNS resolution to translate domain names into IP addresses.
+- TCP connection establishment for downloads.
+- TLS connection integration for secure data transfer.
+- HTTP requests fetch file metadata and initiate range-based downloads.
+- Multi-threaded downloading to optimize download speeds and efficiency.
+- File parts are saved and merged to reconstruct the original file.
 
 
 ## Data Flow Overview
-    - User Input: The program starts by parsing user inputs from the command line (such as the URL, output filename, and number of connections).
-    - DNS Resolution: The domain name is resolved to obtain the IP address of the server.
-    - TCP : A TCP connection is established. 
-    - TLS Connection: If secure transmission is required, TLS manages the secure session.
-    - Download Initiation(single-threaded):  HTTP requests is used to download the specified file, and these downloaded file is saved.
-    - Multi-threaded download(to be implemented): Splitting and downloaded the file and saving the parts.
-    - File Merging(to be implemented): Once all parts are downloaded, the program will merge them into a single coherent file.
+- **User Input:** Starts by collecting user inputs such as the URL, output filename, and number of connections from the command line.
+- **DNS Resolution:** Resolves the domain name to an IP address of the server.
+- **TCP Connection:** Establishes a TCP connection.
+- **TLS Connection:** Manages secure sessions if required.
+- **HTTP Request:** Retrieves file metadata and starts range-based downloads.
+- **Multi-threaded Download:** Downloads file parts concurrently.
+- **File Merging:** Merges downloaded parts into a single file after all parts are downloaded.
+
 
 ## Crates Dependencies
     The project uses the following crates to help achieve the desired functionality:
