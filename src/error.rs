@@ -17,7 +17,6 @@ pub enum DownloaderError {
     UserInputError(String),
 }
 
-// Add this implementation for Display
 impl fmt::Display for DownloaderError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
@@ -34,7 +33,6 @@ impl fmt::Display for DownloaderError {
     }
 }
 
-// Add this implementation for Error
 impl std::error::Error for DownloaderError {}
 
 impl From<io::Error> for DownloaderError {
