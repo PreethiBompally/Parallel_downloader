@@ -48,3 +48,13 @@ Parallel Downloader is a Rust-based command-line tool aimed at creating a highly
     - input url to download
     - input number of connections
     - input output filename
+
+Example urls to test the application:
+    - https://cobweb.cs.uga.edu/~perdisci/CSCI6760-F21/Project2-TestFiles/Uga-VII.jpg
+    - https://cobweb.cs.uga.edu/~perdisci/CSCI6760-F21/Project2-TestFiles/story_hairydawg_UgaVII.jpg
+    - https://www.nasa.gov/wp-content/uploads/2024/10/ksc-20240819-ph-jbs01-0022orig.jpg
+    - https://www.nasa.gov/wp-content/uploads/2024/11/iss070e028324orig.jpg
+    - https://filesampleshub.com/download/image/png/sample3.png
+    - https://cobweb.cs.uga.edu/~perdisci/CSCI6760-F21/Project2-TestFiles/topnav-sport2_r1_c1.gif
+
+Note: The application works perfectly with urls which have file extension at the end
