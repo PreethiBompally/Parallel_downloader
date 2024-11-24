@@ -88,6 +88,9 @@ fn handle_download() -> Result<(), DownloaderError> {
         .ok_or_else(|| DownloaderError::UrlParseError(url::ParseError::EmptyHost))?;
     let path = url.path();
 
+    println!("{}", hostname);
+    println!("{}", path);
+
     println!("Resolving hostname...");
     let ip = dns::get_request_ip(hostname)?;
 

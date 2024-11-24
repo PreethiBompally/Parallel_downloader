@@ -1,9 +1,18 @@
+//! # Error Handling
+//!
+//! This module defines a custom error type `DownloaderError` for handling various
+//! errors that might occur during the download process.
+//!
+//! ## Features
+//! - Handles IO, TLS, URL, DNS, and connection errors.
+
 use std::io;
 use url;
 use native_tls::HandshakeError;
 use std::net::TcpStream;
 use std::fmt;
 
+/// Enum representing all possible errors in the downloader.
 #[derive(Debug)]
 pub enum DownloaderError {
     IoError(io::Error),
