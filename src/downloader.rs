@@ -1,3 +1,13 @@
+//! # Download Manager
+//!
+//! This module orchestrates the downloading of files in parallel by splitting the file into
+//! parts and downloading each part concurrently. It also merges the parts into a final file.
+//!
+//! ## Features
+//! - Splits files into parts for parallel downloads.
+//! - Manages threads for downloading each part.
+//! - Merges the downloaded parts into a complete file.
+
 use std::fs::{self, File};
 use std::io::{Read, Write};
 use std::path::Path;
@@ -8,19 +18,33 @@ use crate::{config::DownloadConfig, connection, dns, error::DownloaderError};
 
 #[derive(Clone)]
 struct DownloadPart {
+    /// Starting byte of the part.
     start: u64,
+    /// Ending byte of the part.
     end: u64,
+    /// Identifier for the part.
     part_number: usize,
 }
 
 pub struct DownloadManager {
+    /// Configuration for the download.
     config: DownloadConfig,
+    /// Total size of the file.
     #[allow(dead_code)]
     total_size: u64,
+    /// Parts of the file to download.
     parts: Vec<DownloadPart>,
 }
 
 impl DownloadManager {
+    /// Creates a new `DownloadManager` instance.
+    ///
+    /// # Parameters
+    /// - `config`: The configuration for the download.
+    /// - `total_size`: The total size of the file.
+    ///
+    /// # Returns
+    /// A new `DownloadManager` instance.
     pub fn new(config: DownloadConfig, total_size: u64) -> Self {
         let mut parts = Vec::new();
         let part_size = total_size / config.num_connections as u64;
@@ -47,6 +71,10 @@ impl DownloadManager {
         }
     }
 
+    /// Downloads the file using multiple threads.
+    ///
+    /// # Returns
+    /// A `Result` indicating success or failure of the download.
     pub fn download(&self) -> Result<(), DownloaderError> {
         let url = Url::parse(&self.config.url)?;
         let hostname = url.host_str()
@@ -89,7 +117,17 @@ impl DownloadManager {
         Ok(())
     }
 
+    /// Merges the downloaded parts into a single file.
+    ///
+    /// # Returns
+    /// A `Result` indicating success or failure of the merge.
     fn merge_parts(&self) -> Result<(), DownloaderError> {
+        if self.parts.is_empty() {
+            return Err(DownloaderError::FileError(
+                "No parts to merge. Parts list is empty.".into(),
+            ));
+        }
+
         if let Some(parent) = Path::new(&self.config.output_file).parent() {
             fs::create_dir_all(parent)?;
         }
@@ -109,7 +147,6 @@ impl DownloadManager {
     fn get_part_filename(&self, part_number: usize) -> String {
         let base_path = Path::new(&self.config.output_file);
         let parent = base_path.parent().unwrap_or_else(|| Path::new(""));
-        // let file_stem = base_path.file_stem().unwrap_or_default();
         let extension = base_path.extension().unwrap_or_default();
         
         let part_name = format!("part{}", part_number);
@@ -155,4 +192,41 @@ fn find_body_start(response: &[u8]) -> Option<usize> {
         i += 1;
     }
     None
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{DownloadManager, DownloadConfig};
+
+    #[test]
+    fn test_download_manager_creation() {
+        let config = DownloadConfig::new(
+            "https://cobweb.cs.uga.edu/~perdisci/CSCI6760-F21/Project2-TestFiles/Uga-VII.jpg".to_string(),
+            "output.jpg".to_string(),
+            4,
+        );
+        let manager = DownloadManager::new(config.clone(), 1000);
+        assert_eq!(manager.config.url, config.url);
+        assert_eq!(manager.config.output_file, config.output_file);
+        assert_eq!(manager.config.num_connections, config.num_connections);
+    }
+
+    #[test]
+    fn test_merge_parts_empty() {
+        use std::fs;
+        let config = DownloadConfig::new(
+            "https://cobweb.cs.uga.edu/~perdisci/CSCI6760-F21/Project2-TestFiles/Uga-VII.jpg".to_string(),
+            "output.jpg".to_string(),
+            4,
+        );
+
+        let mut manager = DownloadManager::new(config, 1000);
+        manager.parts.clear();
+        manager.parts.iter().for_each(|part| {
+            let filename = manager.get_part_filename(part.part_number);
+            let _ = fs::remove_file(filename);
+        });
+        let result = manager.merge_parts();
+        assert!(result.is_err(), "Expected merge_parts to fail when no parts exist.");
+    }
 }
