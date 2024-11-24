@@ -1,9 +1,12 @@
-use parallel_downloader::{DownloadConfig, DownloadManager, DownloaderError,dns, connection, http};
+use parallel_downloader::{DownloadConfig, DownloadManager, DownloaderError, dns, connection, http};
 use url::Url;
-use std::io::{self, Write};
+use std::io::{self, Write, BufRead};
 use std::path::Path;
 
 fn main() -> Result<(), DownloaderError> {
+    let stdin = io::stdin();
+    let mut stdin_lock = stdin.lock();
+    
     println!("\n=== Parallel File Downloader ===\n");
 
     loop {
@@ -11,14 +14,17 @@ fn main() -> Result<(), DownloaderError> {
         println!("1. Download a file");
         println!("2. Exit");
         print!("\nEnter your choice (1-2): ");
-        io::stdout().flush().unwrap();
+        io::stdout().flush()?;
 
         let mut choice = String::new();
-        io::stdin().read_line(&mut choice)?;
+        if stdin_lock.read_line(&mut choice).is_err() {
+            println!("Error reading input. Please try again.");
+            continue;
+        }
 
         match choice.trim() {
             "1" => {
-                if let Err(e) = handle_download() {
+                if let Err(e) = handle_download(&mut stdin_lock) {
                     eprintln!("\nError: {}", e);
                 }
             }
@@ -26,6 +32,7 @@ fn main() -> Result<(), DownloaderError> {
                 println!("\nThank You!");
                 break;
             }
+            "" => continue, // Skip empty input
             _ => println!("\nInvalid choice. Please try again."),
         }
     }
@@ -33,12 +40,12 @@ fn main() -> Result<(), DownloaderError> {
     Ok(())
 }
 
-fn handle_download() -> Result<(), DownloaderError> {
+fn handle_download(stdin: &mut impl BufRead) -> Result<(), DownloaderError> {
     // Get URL
     print!("\nEnter URL to download: ");
-    io::stdout().flush().unwrap();
+    io::stdout().flush()?;
     let mut url_input = String::new();
-    io::stdin().read_line(&mut url_input)?;
+    stdin.read_line(&mut url_input)?;
     let url_input = url_input.trim().to_string();
 
     // Validate URL
@@ -46,9 +53,9 @@ fn handle_download() -> Result<(), DownloaderError> {
 
     // Get number of connections
     print!("Enter number of connections (1-32, default 4): ");
-    io::stdout().flush().unwrap();
+    io::stdout().flush()?;
     let mut connections_input = String::new();
-    io::stdin().read_line(&mut connections_input)?;
+    stdin.read_line(&mut connections_input)?;
     let num_connections = connections_input.trim().parse().unwrap_or(4);
 
     if num_connections < 1 || num_connections > 32 {
@@ -62,9 +69,9 @@ fn handle_download() -> Result<(), DownloaderError> {
         .unwrap_or("downloaded_file".to_string());
 
     print!("Enter output filename (default: {}): ", default_filename);
-    io::stdout().flush().unwrap();
+    io::stdout().flush()?;
     let mut filename_input = String::new();
-    io::stdin().read_line(&mut filename_input)?;
+    stdin.read_line(&mut filename_input)?;
     let output_filename = if filename_input.trim().is_empty() {
         default_filename.clone()
     } else {
@@ -87,9 +94,6 @@ fn handle_download() -> Result<(), DownloaderError> {
     let hostname = url.host_str()
         .ok_or_else(|| DownloaderError::UrlParseError(url::ParseError::EmptyHost))?;
     let path = url.path();
-
-    println!("{}", hostname);
-    println!("{}", path);
 
     println!("Resolving hostname...");
     let ip = dns::get_request_ip(hostname)?;
