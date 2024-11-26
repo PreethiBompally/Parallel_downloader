@@ -9,7 +9,7 @@ fuzz_target!(|data: &[u8]| {
     if let Ok(path) = std::str::from_utf8(data) {
         let hostname = "example.com";
         if let Ok(ip) = get_request_ip(hostname) {
-            if let Ok(mut stream) = establish_tls_connection(hostname, ip) {
+            if let Ok(_stream) = establish_tls_connection(hostname, ip) {
                 let part = parallel_downloader::downloader::DownloadPart {
                     start: 0,
                     end: 100,

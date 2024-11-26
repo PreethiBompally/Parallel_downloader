@@ -17,13 +17,13 @@ use url::Url;
 use crate::{config::DownloadConfig, connection, dns, error::DownloaderError};
 
 #[derive(Clone)]
-struct DownloadPart {
+pub struct DownloadPart {
     /// Starting byte of the part.
-    start: u64,
+    pub start: u64,
     /// Ending byte of the part.
-    end: u64,
+    pub end: u64,
     /// Identifier for the part.
-    part_number: usize,
+    pub part_number: usize,
 }
 
 pub struct DownloadManager {
@@ -157,7 +157,7 @@ impl DownloadManager {
     }
 }
 
-fn download_part(
+pub fn download_part(
     hostname: &str,
     path: &str,
     part: &DownloadPart,
