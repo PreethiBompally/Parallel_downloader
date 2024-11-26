@@ -27,12 +27,6 @@ Parallel Downloader is a Rust-based command-line tool aimed at creating a highly
 ## Crates Dependencies
     The project uses the following crates to help achieve the desired functionality:
 
-        - clap: This crate is used for parsing command-line arguments. It provides an easy-to-use interface for defining and retrieving user inputs, making the downloader versatile and easy to interact with.
-
-        - rustls: This crate is used for establishing secure connections using TLS. It ensures encrypted communication when downloading files over HTTPS. (Planned for integration in a future release.)
-
-        - webpki_roots: This crate provides trusted root certificates required by rustls for TLS handshake. (To be implemented along with TLS integration.)
-
         - Standard Library (std): Rust’s standard library is used for foundational functionalities like networking (std::net), file handling (std::fs), multithreading (std::thread), and input/output operations (std::io).
 
         - native-tls: This crate provides bindings to native TLS libraries, allowing the downloader to establish secure connections using the underlying system's TLS implementation. It simplifies handling encrypted communication for file downloads over HTTPS.
@@ -44,6 +38,13 @@ Parallel Downloader is a Rust-based command-line tool aimed at creating a highly
     To compile and run the project:
     - cargo build
     - cargo run
+    - input url to download
+    - input number of connections
+    - input output filename
+
+    To run the project using docker
+    - docker build -t parallel-downloader .
+    - docker run -it --init -v $(pwd)/downloads:/downloads parallel-downloader
     - input url to download
     - input number of connections
     - input output filename
