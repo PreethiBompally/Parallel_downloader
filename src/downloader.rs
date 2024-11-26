@@ -121,7 +121,7 @@ impl DownloadManager {
     ///
     /// # Returns
     /// A `Result` indicating success or failure of the merge.
-    fn merge_parts(&self) -> Result<(), DownloaderError> {
+    pub fn merge_parts(&self) -> Result<(), DownloaderError> {
         if self.parts.is_empty() {
             return Err(DownloaderError::FileError(
                 "No parts to merge. Parts list is empty.".into(),
